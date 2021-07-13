@@ -1,6 +1,7 @@
 import 'package:memory_game/model/tile_model.dart';
 
-int points = 1000;
+int points = 0;
+int matches = 10;
 bool selected = false;
 String selectedImageAssetPath = "";
 int selectedTileIndex = 123;

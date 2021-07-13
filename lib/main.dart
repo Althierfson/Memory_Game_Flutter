@@ -13,9 +13,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
+      theme: new ThemeData(
         primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Colors.lightBlue.shade50
       ),
+      debugShowCheckedModeBanner: false,
       home: HomePage(),
     );
   }
@@ -47,6 +49,28 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void ResetGame(){
+    print("Game Reseted");
+
+    setState(() {
+      points = 0;
+      matches = 0;
+
+      pairs = getPairs();
+      pairs.shuffle();
+
+      visiblePairs = pairs;
+      selected = true;
+    });
+
+    Future.delayed(const Duration(seconds: 4), (){
+      setState(() {
+        visiblePairs = getHideSide();
+        selected = false;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +79,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: <Widget>[
             SizedBox(height: 25),
-            points != 1000 ? Column(
+            matches != 10 ? Column(
               children: [
                 Text("$points/1000", style:TextStyle(
                   fontSize: 24,
@@ -65,7 +89,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ) : Container(),
             SizedBox(height: 20, ),
-            points != 1000 ? GridView(
+            matches != 10 ? GridView(
               shrinkWrap: true,
               gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                 mainAxisSpacing: 0.0, maxCrossAxisExtent: 100
@@ -78,17 +102,62 @@ class _HomePageState extends State<HomePage> {
                 );
               }),
             ) : Container(
-              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(24)
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text( "You Points: $points",
+                    style: TextStyle(
+                      fontSize: 28, fontWeight: FontWeight.w500, 
+                    ),
+                  ),
+                  SizedBox(height: 20, ),
+                  Text( "Are you relly a Human?",
+                    style: TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.w500, 
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20, ),
+                  TextButton(
+                    style: ButtonStyle(
+                      foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                      backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                          side:BorderSide(color: Colors.black),
+                        )
+                      ),
+                    ),
+                    onPressed: (){
+                      ResetGame();
+                    }, 
+                    child: Text("Replay",
+                        style: TextStyle(
+                        fontSize: 34, fontWeight: FontWeight.w500,
+                      ),
+                    )),
+                  SizedBox(height: 20, ),
+                  TextButton(
+                    style: ButtonStyle(
+                      foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                      backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                          side:BorderSide(color: Colors.black),
+                        )
+                      ),
+                    ),
+                    onPressed: (){}, 
+                    child: Text(" Menu ",
+                        style: TextStyle(
+                        fontSize: 34, fontWeight: FontWeight.w500,
+                      ),
+                    ))
+                ],
               ),
-              child: Text("Replay", style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
-                color: Colors.white
-              ),),
             )
           ],
         ),
@@ -122,9 +191,10 @@ class _TileState extends State<Tile> {
               selectedImageAssetPath = "";
               selected = true;
 
-              Future.delayed(const Duration(seconds: 2), (){
+              Future.delayed(const Duration(seconds: 3), (){
                 setState(() {  
                   points = points + 100;
+                  matches = matches + 1;
                 });
                 selected = false;
                 widget.parent.setState(() {
@@ -139,7 +209,7 @@ class _TileState extends State<Tile> {
               Future.delayed(const Duration(seconds: 2), () {
                 selected = false;
                 setState(() {
-                  //points = points - 50;
+                  points = points - 50; 
                 });
                 widget.parent.setState(() {
                   pairs[widget.tileIndex].setIsSelected(false);
