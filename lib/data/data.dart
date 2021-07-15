@@ -1,7 +1,10 @@
 import 'package:memory_game/model/tile_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+bool menu = true;
 int points = 0;
-int matches = 10;
+int record = 0;
+int matches = 0;
 bool selected = false;
 String selectedImageAssetPath = "";
 int selectedTileIndex = 123;
@@ -123,4 +126,20 @@ List<TileModel> getHideSide() {
   pairs.add(tileModel);
 
   return pairs;
+}
+
+void saveRecord (int reco) async {
+  final saveData = await SharedPreferences.getInstance();
+
+  if(reco > record){
+    saveData.setInt("Record", record);
+  }
+}
+
+Future<int> loadRecord() async {
+  final saveData = await SharedPreferences.getInstance();
+
+  int record = saveData.getInt("Record") ?? 0;
+
+  return record;
 }

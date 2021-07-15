@@ -35,21 +35,14 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
 
-    pairs = getPairs();
-    pairs.shuffle();
-
-    visiblePairs = pairs;
-    selected = true;
-
-    Future.delayed(const Duration(seconds: 5), (){
-      setState(() {
-        visiblePairs = getHideSide();
-        selected = false;
-      });
-    });
+    readDatas();
   }
 
-  void ResetGame(){
+  void readDatas() async {
+    record = await loadRecord();
+  }
+
+  void resetGame(){
     print("Game Reseted");
 
     setState(() {
@@ -76,7 +69,44 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Container(
         padding: EdgeInsets.symmetric(vertical: 50, horizontal: 20),
-        child: Column(
+        child: menu == true ? Center(
+          child: Column(
+          children: [
+            SizedBox(height: 25),
+            Text("Memory Game",
+                style: TextStyle(
+                fontSize: 34, fontWeight: FontWeight.w500,
+              ),
+            ),
+            SizedBox(height: 25),
+            Text("Record: $record",
+                style: TextStyle(
+                fontSize: 25, fontWeight: FontWeight.w500,
+              ),
+            ),
+            SizedBox(height: 25),
+            TextButton(
+              style: ButtonStyle(
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                    side:BorderSide(color: Colors.black),
+                  )
+                ),
+              ),
+              onPressed: (){
+                menu = false;
+                resetGame();
+              }, 
+              child: Text("New Game",
+                  style: TextStyle(
+                  fontSize: 34, fontWeight: FontWeight.w500,
+                ),
+              ))
+          ],
+        )) : Column(
           children: <Widget>[
             SizedBox(height: 25),
             matches != 10 ? Column(
@@ -106,17 +136,16 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text( "You Points: $points",
+                  Text( "End Game",
                     style: TextStyle(
                       fontSize: 28, fontWeight: FontWeight.w500, 
                     ),
                   ),
                   SizedBox(height: 20, ),
-                  Text( "Are you relly a Human?",
+                  Text( "You Points: $points",
                     style: TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.w500, 
+                      fontSize: 28, fontWeight: FontWeight.w500, 
                     ),
-                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20, ),
                   TextButton(
@@ -131,7 +160,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     onPressed: (){
-                      ResetGame();
+                      resetGame();
                     }, 
                     child: Text("Replay",
                         style: TextStyle(
@@ -150,7 +179,11 @@ class _HomePageState extends State<HomePage> {
                         )
                       ),
                     ),
-                    onPressed: (){}, 
+                    onPressed: (){
+                      setState(() {
+                        menu = true;
+                      }); 
+                    }, 
                     child: Text(" Menu ",
                         style: TextStyle(
                         fontSize: 34, fontWeight: FontWeight.w500,
@@ -191,9 +224,12 @@ class _TileState extends State<Tile> {
               selectedImageAssetPath = "";
               selected = true;
 
-              Future.delayed(const Duration(seconds: 3), (){
+              Future.delayed(const Duration(seconds: 1), (){
                 setState(() {  
                   points = points + 100;
+                  if(matches == 9){
+                    saveRecord(points);
+                  }
                   matches = matches + 1;
                 });
                 selected = false;
@@ -206,7 +242,7 @@ class _TileState extends State<Tile> {
               selectedImageAssetPath = "";
               selected = true;
 
-              Future.delayed(const Duration(seconds: 2), () {
+              Future.delayed(const Duration(seconds: 1), () {
                 selected = false;
                 setState(() {
                   points = points - 50; 
