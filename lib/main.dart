@@ -30,16 +30,19 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
+  String menuMsg = "";
+  String endMsg = "";
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
     readDatas();
   }
 
   void readDatas() async {
     record = await loadRecord();
+    takeMenuMessege();
   }
 
   void resetGame(){
@@ -64,6 +67,62 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void takeMenuMessege(){
+    setState(() {
+      int i=0;
+      String msg, key;
+
+      menuMesseges = getMenuMesseges();
+      
+      if(record == 0){
+        menuMsg = menuMesseges[0].getMessege();
+        return;
+      }
+
+      msg = menuMesseges[0].getMessege();
+      key = menuMesseges[0].getMessege();
+
+      menuMesseges.shuffle();
+
+      while(msg == key && i != menuMesseges.length-1){
+        if(record <= menuMesseges[i].getMaxPoints() && record >= menuMesseges[i].getMinPoints() && menuMesseges[i].getMessege() != key){
+          msg = menuMesseges[i].getMessege();
+          menuMsg =  msg;
+          return;
+        }
+
+        i++;
+      }
+      menuMsg = msg;
+    });
+  }
+
+  String takeEndMessege(){
+    int i=0;
+    String msg, key;
+
+    endMesseges = getEndMesseges();
+
+    if(points == 0){
+      return endMesseges[0].getMessege();
+    }
+
+    msg = endMesseges[0].getMessege();
+    key = endMesseges[0].getMessege();
+
+    endMesseges.shuffle();
+
+    while(msg == key && i != endMesseges.length-1){
+      if(points <= endMesseges[i].getMaxPoints() && points >= endMesseges[i].getMinPoints() && endMesseges[i].getMessege() != key){
+        msg = endMesseges[i].getMessege();
+        return msg;
+      }
+
+      i++;
+    }
+    return msg;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,6 +142,13 @@ class _HomePageState extends State<HomePage> {
                 style: TextStyle(
                 fontSize: 25, fontWeight: FontWeight.w500,
               ),
+            ),
+            SizedBox(height: 25),
+            Text(menuMsg,
+                style: TextStyle(
+                fontSize: 17, fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
             ),
             SizedBox(height: 25),
             TextButton(
@@ -146,6 +212,14 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(
                       fontSize: 28, fontWeight: FontWeight.w500, 
                     ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20, ),
+                  Text( takeEndMessege(),
+                    style: TextStyle(
+                      fontSize: 28, fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20, ),
                   TextButton(
@@ -167,28 +241,6 @@ class _HomePageState extends State<HomePage> {
                         fontSize: 34, fontWeight: FontWeight.w500,
                       ),
                     )),
-                  SizedBox(height: 20, ),
-                  TextButton(
-                    style: ButtonStyle(
-                      foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                      backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                          side:BorderSide(color: Colors.black),
-                        )
-                      ),
-                    ),
-                    onPressed: (){
-                      setState(() {
-                        menu = true;
-                      }); 
-                    }, 
-                    child: Text(" Menu ",
-                        style: TextStyle(
-                        fontSize: 34, fontWeight: FontWeight.w500,
-                      ),
-                    ))
                 ],
               ),
             )
@@ -227,10 +279,11 @@ class _TileState extends State<Tile> {
               Future.delayed(const Duration(seconds: 1), (){
                 setState(() {  
                   points = points + 100;
-                  if(matches == 9){
+                  matches = matches + 1;
+                  if(matches == 10){
+                    print("object save");
                     saveRecord(points);
                   }
-                  matches = matches + 1;
                 });
                 selected = false;
                 widget.parent.setState(() {
@@ -245,7 +298,7 @@ class _TileState extends State<Tile> {
               Future.delayed(const Duration(seconds: 1), () {
                 selected = false;
                 setState(() {
-                  points = points - 50; 
+                  points = points - 75;
                 });
                 widget.parent.setState(() {
                   pairs[widget.tileIndex].setIsSelected(false);
