@@ -1,7 +1,8 @@
 # memory_game
 
-Um simples jogo da Memoria feito em Flutter
+Um simples jogo da Memória feito em Flutter.
 
 Baixe, compile e divirta-se!
 
-Fique a vontade para baixar e fazer modificações!
+Fique à vontade para baixar e fazer modificações!
+
